@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:pulsar="http://www.mulesoft.org/schema/mule/pulsar"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/pulsar http://www.mulesoft.org/schema/mule/pulsar/current/mule-pulsar.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<pulsar:config name="Apache_Pulsar_Config" doc:name="Apache Pulsar Config" doc:id="c4c4efc5-d911-4a73-ad55-7cce6dd49622" >
+		<pulsar:connection bootstrapServer="pulsar://localhost:6650" />
+	</pulsar:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e4c54a94-3f91-4298-b0e1-288cb20b4c7a" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="producer-flow" doc:id="e8d39cd0-a313-418d-8678-75bb969126ec" >
+		<http:listener doc:name="HTTP Listener" doc:id="fb39089e-6d0a-4a6a-8491-f58f866ba008" config-ref="HTTP_Listener_config" path="/"/>
+		<pulsar:publish doc:name="Publisher" doc:id="bcc2e7e5-8dbc-48de-8baf-6e6a22c69151" config-ref="Apache_Pulsar_Config">
+			<pulsar:pulsar-producer-parameter topic="topic-test" />
+		</pulsar:publish>
+	</flow>
+	<flow name="listener-flow" doc:id="6361db2d-2f84-4d44-8a95-eb89ced5aa73" >
+		<pulsar:listener doc:name="Message Listener" doc:id="4df0810d-fa9e-48ea-a6ba-af7c952444e0" config-ref="Apache_Pulsar_Config" topic="topic-test" subscriptionName="abc"/>
+		<logger level="INFO" doc:name="Log received message" doc:id="44c6cad7-1493-4740-b85f-8162e434c2ae" message='#[payload]'/>
+	</flow>
+</mule>
